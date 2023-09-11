@@ -1,0 +1,86 @@
+name: Test coverage
+on:
+  push:
+    branches: 
+      - main
+jobs:
+  test_calculator:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.10 ]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./calculator
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./calculator
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./calculator
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=70
+  test_routes:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.10 ]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./Routes
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./Routes
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./Routes
+        run: pipenv run pytest --cov=app -v -s --cov-fail-under=70
+  test_users:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.10 ]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./Users
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./Users
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./Users
+        run: pipenv run pytest --cov=app -v -s --cov-fail-under=70
+  test_posts:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.10 ]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./Post
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./Post
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./Post
+        run: pipenv run pytest --cov=app -v -s --cov-fail-under=70
+  test_offers:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ 3.10 ]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./Offers
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./Offers
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./Offers
+        run: pipenv run pytest --cov=app -v -s --cov-fail-under=70

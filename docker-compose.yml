@@ -1,0 +1,160 @@
+version: '3'
+
+services:
+  postgres-routes:
+    image: postgres:latest
+    container_name: postgres-routes
+    ports:
+      - "5432:5432"
+    networks:
+      - route_net
+    environment:
+      POSTGRES_DB: routes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: LosAndes1234
+
+
+  trayecto-app:
+    build:
+      context: ./Routes
+      dockerfile: Dockerfile
+    container_name: trayecto-app
+    command: python app.py
+    ports:
+      - "3002:3002"
+    networks:
+      - route_net
+      - app_net
+    environment:
+      POSTGRES_DB: routes
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: LosAndes1234
+      DB_HOST: postgres-routes
+      DB_NAME: routes
+      USERS_PATH: http://usuario-app:3000
+    depends_on:
+      - postgres-routes
+
+
+  postgres-usuario:
+    image: postgres:latest
+    container_name: postgres-usuario
+    ports:
+      - "5433:5433"
+    networks:
+      - user_net
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: LosAndes1234
+    depends_on:
+      - trayecto-app
+
+  usuario-app:
+    build:
+       context: ./Users
+       dockerfile: Dockerfile
+    container_name: usuario-app
+    command: python app.py
+    ports:
+       - "3000:3000"
+    networks:
+      - user_net
+      - app_net
+    environment:
+      POSTGRES_DB: users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: LosAndes1234
+      DB_HOST: postgres-users
+      DB_NAME: users
+      USERS_PATH: http://usuario-app:3000
+    depends_on:
+       - postgres-usuario
+
+  postgres-publicacion:
+    image: postgres:latest
+    container_name: postgres-publicacion
+    ports:
+      - "5434:5434"
+    networks:
+      - post_net
+    environment:
+      POSTGRES_DB: posts
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: LosAndes1234
+    depends_on:
+      - usuario-app
+
+  publicacion-app:
+    build:
+      context: ./Post
+      dockerfile: Dockerfile
+    container_name: publicacion-app
+    command: python app.py
+    ports:
+      - "3001:3001"
+    networks:
+      - post_net
+      - app_net
+    environment:
+      POSTGRES_DB: posts
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: LosAndes1234
+      DB_HOST: postgres-publicacion
+      DB_NAME: posts
+      USERS_PATH: http://usuario-app:3000
+    depends_on:
+      - postgres-publicacion
+
+
+  postgres-oferta:
+    image: postgres:latest
+    container_name: postgres-oferta
+    ports:
+      - "5435:5435"
+    networks:
+      - offer_net
+    environment:
+      POSTGRES_DB: offers
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: LosAndes1234
+    depends_on:
+      - publicacion-app
+      
+  oferta-app:
+    build:
+      context: ./Offers
+      dockerfile: Dockerfile
+    container_name: oferta-app
+    command: python app.py
+    ports:
+      - "3003:3003"
+    networks:
+      - offer_net
+      - app_net
+    environment:
+    
+      POSTGRES_DB: offers
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: LosAndes1234
+      DB_HOST: postgres-oferta
+      DB_PORT: 5435
+      DB_NAME: offers
+      USERS_PATH: http://usuario-app:3000
+    depends_on:
+      - postgres-oferta
+
+
+
+
+networks:
+  app_net:
+    driver: bridge
+  user_net:
+    driver: bridge
+  post_net:
+    driver: bridge
+  offer_net:
+    driver: bridge
+  route_net:
+    driver: bridge

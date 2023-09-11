@@ -1,0 +1,12 @@
+Flask
+Flask-SQLAlchemy
+Flask-JWT-Extended
+gunicorn
+psycopg2-binary
+Faker
+coverage
+requests
+pytest
+pytest-cov
+pytest-mock
+pytest-env
